@@ -33,24 +33,33 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-gradient-subtle animate-fade-in">
       <div className="container mx-auto px-4 py-6 max-w-7xl">
-        <DashboardHeader 
-          onAddSavings={() => handleAddTransaction("savings")}
-          onAddExpense={() => handleAddTransaction("expense")}
-          onOCRUpload={() => setIsOCRModalOpen(true)}
-        />
+        <div className="animate-scale-in">
+          <DashboardHeader 
+            onAddSavings={() => handleAddTransaction("savings")}
+            onAddExpense={() => handleAddTransaction("expense")}
+            onOCRUpload={() => setIsOCRModalOpen(true)}
+          />
+        </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <SavingsCard {...savingsData} />
-              <BudgetCard {...budgetData} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in" 
+                 style={{ animationDelay: '0.1s' }}>
+              <div className="animate-card">
+                <SavingsCard {...savingsData} />
+              </div>
+              <div className="animate-card" style={{ animationDelay: '0.2s' }}>
+                <BudgetCard {...budgetData} />
+              </div>
             </div>
-            <TransactionHistory />
+            <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <TransactionHistory />
+            </div>
           </div>
           
-          <div className="space-y-6">
+          <div className="space-y-6 animate-slide-in-right" style={{ animationDelay: '0.4s' }}>
             <GroupMembers />
           </div>
         </div>

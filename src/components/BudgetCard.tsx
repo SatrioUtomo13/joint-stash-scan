@@ -25,7 +25,7 @@ export const BudgetCard = ({ totalBudget, spent, remaining, period }: BudgetCard
 
   return (
     <Card className={cn(
-      "shadow-card hover:shadow-elegant transition-all duration-300 border-l-4",
+      "shadow-card hover:shadow-elegant transition-all duration-300 border-l-4 animate-card group",
       isOverBudget ? "border-l-destructive" : isNearLimit ? "border-l-warning" : "border-l-primary"
     )}>
       <CardHeader className="pb-3">

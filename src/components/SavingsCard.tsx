@@ -21,11 +21,11 @@ export const SavingsCard = ({ currentAmount, targetAmount, goalTitle, contributo
   };
 
   return (
-    <Card className="shadow-card hover:shadow-elegant transition-all duration-300 border-l-4 border-l-accent">
+    <Card className="shadow-card hover:shadow-elegant transition-all duration-300 border-l-4 border-l-accent animate-card group">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between">
           <span className="text-lg font-semibold">{goalTitle}</span>
-          <TrendingUp className="w-5 h-5 text-accent" />
+          <TrendingUp className="w-5 h-5 text-accent group-hover:animate-bounce-gentle transition-all" />
         </CardTitle>
       </CardHeader>
       

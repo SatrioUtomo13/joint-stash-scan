@@ -10,7 +10,7 @@ interface DashboardHeaderProps {
 export const DashboardHeader = ({ onAddSavings, onAddExpense, onOCRUpload }: DashboardHeaderProps) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-      <div>
+      <div className="animate-fade-in">
         <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
           Joint Savings
         </h1>
@@ -19,20 +19,20 @@ export const DashboardHeader = ({ onAddSavings, onAddExpense, onOCRUpload }: Das
         </p>
       </div>
       
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 animate-fade-in" style={{ animationDelay: '0.2s' }}>
         <Button 
           onClick={onAddSavings}
-          className="bg-gradient-accent hover:shadow-glow transition-all"
+          className="bg-gradient-accent hover:shadow-glow transition-all hover-scale"
           size="sm"
         >
-          <PlusCircle className="w-4 h-4 mr-2" />
+          <PlusCircle className="w-4 h-4 mr-2 animate-bounce-gentle" />
           Add Savings
         </Button>
         
         <Button 
           onClick={onAddExpense}
           variant="outline"
-          className="border-primary/20 hover:bg-primary/5"
+          className="border-primary/20 hover:bg-primary/5 hover-scale"
           size="sm"
         >
           <Wallet className="w-4 h-4 mr-2" />
@@ -42,7 +42,7 @@ export const DashboardHeader = ({ onAddSavings, onAddExpense, onOCRUpload }: Das
         <Button 
           onClick={onOCRUpload}
           variant="secondary"
-          className="bg-secondary hover:bg-secondary/80"
+          className="bg-secondary hover:bg-secondary/80 hover-scale hover-glow"
           size="sm"
         >
           <Scan className="w-4 h-4 mr-2" />

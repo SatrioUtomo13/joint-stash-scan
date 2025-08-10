@@ -91,17 +91,18 @@ export const TransactionHistory = () => {
       <CardContent>
         <ScrollArea className="h-[400px]">
           <div className="space-y-3">
-            {mockTransactions.map((transaction) => (
+            {mockTransactions.map((transaction, index) => (
               <div
                 key={transaction.id}
-                className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/30 transition-colors"
+                className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/30 transition-all duration-300 hover-scale animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="flex items-center gap-3">
                   <div className={cn(
-                    "p-2 rounded-full",
+                    "p-2 rounded-full transition-all duration-300 hover:scale-110",
                     transaction.type === "savings" 
-                      ? "bg-accent/10 text-accent" 
-                      : "bg-primary/10 text-primary"
+                      ? "bg-accent/10 text-accent hover:bg-accent/20" 
+                      : "bg-primary/10 text-primary hover:bg-primary/20"
                   )}>
                     {transaction.type === "savings" ? (
                       <TrendingUp className="w-4 h-4" />

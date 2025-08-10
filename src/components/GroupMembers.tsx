@@ -73,12 +73,13 @@ export const GroupMembers = () => {
       
       <CardContent>
         <div className="space-y-4">
-          {mockMembers.map((member) => (
+          {mockMembers.map((member, index) => (
             <div
               key={member.id}
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 transition-all duration-300 hover-scale animate-fade-in"
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <Avatar className="h-10 w-10">
+              <Avatar className="h-10 w-10 transition-transform duration-300 hover:scale-110">
                 <AvatarImage src={member.avatar} alt={member.name} />
                 <AvatarFallback className="bg-primary/10 text-primary font-medium">
                   {getInitials(member.name)}
