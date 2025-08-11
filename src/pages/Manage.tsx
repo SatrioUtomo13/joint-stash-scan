@@ -4,9 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { PlusCircle, Target, Wallet, Edit, Trash2, ArrowLeft } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PlusCircle, Target, Wallet, Edit, Trash2, ArrowLeft, Scan, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { AddTransactionModal } from "@/components/AddTransactionModal";
+import { OCRUploadModal } from "@/components/OCRUploadModal";
 
 interface SavingsGoal {
   id: string;
@@ -67,6 +71,9 @@ const Manage = () => {
   const [newBudget, setNewBudget] = useState({ title: "", totalBudget: "", period: "" });
   const [savingsDialogOpen, setSavingsDialogOpen] = useState(false);
   const [budgetDialogOpen, setBudgetDialogOpen] = useState(false);
+  const [addSavingsModalOpen, setAddSavingsModalOpen] = useState(false);
+  const [addExpenseModalOpen, setAddExpenseModalOpen] = useState(false);
+  const [ocrModalOpen, setOcrModalOpen] = useState(false);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -136,6 +143,35 @@ const Manage = () => {
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
             Manage Goals & Budgets
           </h1>
+        </div>
+
+        {/* Quick Actions Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <Button 
+            onClick={() => setAddSavingsModalOpen(true)}
+            className="h-20 flex-col gap-2 bg-gradient-accent hover:shadow-glow hover-scale"
+          >
+            <Plus className="w-6 h-6" />
+            Add Savings
+          </Button>
+          
+          <Button 
+            onClick={() => setAddExpenseModalOpen(true)}
+            variant="outline"
+            className="h-20 flex-col gap-2 border-primary/20 hover:bg-primary/5 hover:text-primary hover-scale"
+          >
+            <Wallet className="w-6 h-6" />
+            Add Expense
+          </Button>
+          
+          <Button 
+            onClick={() => setOcrModalOpen(true)}
+            variant="secondary"
+            className="h-20 flex-col gap-2 hover-scale hover-glow"
+          >
+            <Scan className="w-6 h-6" />
+            Scan Receipt
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -323,6 +359,24 @@ const Manage = () => {
           </div>
         </div>
       </div>
+      
+      {/* Modals */}
+      <AddTransactionModal
+        isOpen={addSavingsModalOpen}
+        onClose={() => setAddSavingsModalOpen(false)}
+        type="savings"
+      />
+      
+      <AddTransactionModal
+        isOpen={addExpenseModalOpen}
+        onClose={() => setAddExpenseModalOpen(false)}
+        type="expense"
+      />
+      
+      <OCRUploadModal
+        isOpen={ocrModalOpen}
+        onClose={() => setOcrModalOpen(false)}
+      />
     </div>
   );
 };

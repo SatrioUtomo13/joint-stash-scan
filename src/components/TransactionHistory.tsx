@@ -94,7 +94,7 @@ export const TransactionHistory = () => {
             {mockTransactions.map((transaction, index) => (
               <div
                 key={transaction.id}
-                className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/30 transition-all duration-300 hover-scale animate-fade-in"
+                className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/30 transition-all duration-300 hover:scale-[1.02] animate-fade-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="flex items-center gap-3">

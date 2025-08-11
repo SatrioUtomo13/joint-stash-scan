@@ -25,7 +25,7 @@ export const DashboardHeader = ({ onAddSavings, onAddExpense, onOCRUpload }: Das
         <Button 
           onClick={() => navigate("/manage")}
           variant="outline"
-          className="border-primary/20 hover:bg-primary/5 hover-scale"
+          className="border-primary/20 hover:bg-primary/5 hover:text-primary hover-scale"
           size="sm"
         >
           <Settings className="w-4 h-4 mr-2" />
@@ -44,7 +44,7 @@ export const DashboardHeader = ({ onAddSavings, onAddExpense, onOCRUpload }: Das
         <Button 
           onClick={onAddExpense}
           variant="outline"
-          className="border-primary/20 hover:bg-primary/5 hover-scale"
+          className="border-primary/20 hover:bg-primary/5 hover:text-primary hover-scale"
           size="sm"
         >
           <Wallet className="w-4 h-4 mr-2" />
