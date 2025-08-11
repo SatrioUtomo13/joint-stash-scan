@@ -8,9 +8,10 @@ interface BudgetCardProps {
   spent: number;
   remaining: number;
   period: string;
+  title?: string;
 }
 
-export const BudgetCard = ({ totalBudget, spent, remaining, period }: BudgetCardProps) => {
+export const BudgetCard = ({ totalBudget, spent, remaining, period, title = "Monthly Budget" }: BudgetCardProps) => {
   const spentPercentage = (spent / totalBudget) * 100;
   const isOverBudget = spentPercentage > 100;
   const isNearLimit = spentPercentage > 80;
@@ -30,7 +31,7 @@ export const BudgetCard = ({ totalBudget, spent, remaining, period }: BudgetCard
     )}>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between">
-          <span className="text-lg font-semibold">Monthly Budget</span>
+          <span className="text-lg font-semibold">{title}</span>
           {isNearLimit && (
             <AlertTriangle className={cn(
               "w-5 h-5",

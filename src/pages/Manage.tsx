@@ -1,0 +1,330 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { PlusCircle, Target, Wallet, Edit, Trash2, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
+
+interface SavingsGoal {
+  id: string;
+  title: string;
+  currentAmount: number;
+  targetAmount: number;
+  contributors: number;
+}
+
+interface Budget {
+  id: string;
+  title: string;
+  totalBudget: number;
+  spent: number;
+  period: string;
+}
+
+const Manage = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  // Mock data - in real app this would come from backend
+  const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([
+    {
+      id: "1",
+      title: "Dream House Fund",
+      currentAmount: 45000000,
+      targetAmount: 100000000,
+      contributors: 4
+    },
+    {
+      id: "2", 
+      title: "Wedding Dream",
+      currentAmount: 15000000,
+      targetAmount: 50000000,
+      contributors: 2
+    }
+  ]);
+
+  const [budgets, setBudgets] = useState<Budget[]>([
+    {
+      id: "1",
+      title: "Monthly Expenses",
+      totalBudget: 5000000,
+      spent: 3250000,
+      period: "January 2024"
+    },
+    {
+      id: "2",
+      title: "Entertainment Budget", 
+      totalBudget: 2000000,
+      spent: 800000,
+      period: "January 2024"
+    }
+  ]);
+
+  const [newSavings, setNewSavings] = useState({ title: "", targetAmount: "" });
+  const [newBudget, setNewBudget] = useState({ title: "", totalBudget: "", period: "" });
+  const [savingsDialogOpen, setSavingsDialogOpen] = useState(false);
+  const [budgetDialogOpen, setBudgetDialogOpen] = useState(false);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
+
+  const handleAddSavings = () => {
+    if (!newSavings.title || !newSavings.targetAmount) return;
+    
+    const savings: SavingsGoal = {
+      id: Date.now().toString(),
+      title: newSavings.title,
+      currentAmount: 0,
+      targetAmount: parseInt(newSavings.targetAmount),
+      contributors: 1
+    };
+    
+    setSavingsGoals([...savingsGoals, savings]);
+    setNewSavings({ title: "", targetAmount: "" });
+    setSavingsDialogOpen(false);
+    toast({ title: "Savings goal created successfully!" });
+  };
+
+  const handleAddBudget = () => {
+    if (!newBudget.title || !newBudget.totalBudget || !newBudget.period) return;
+    
+    const budget: Budget = {
+      id: Date.now().toString(),
+      title: newBudget.title,
+      totalBudget: parseInt(newBudget.totalBudget),
+      spent: 0,
+      period: newBudget.period
+    };
+    
+    setBudgets([...budgets, budget]);
+    setNewBudget({ title: "", totalBudget: "", period: "" });
+    setBudgetDialogOpen(false);
+    toast({ title: "Budget created successfully!" });
+  };
+
+  const deleteSavings = (id: string) => {
+    setSavingsGoals(savingsGoals.filter(goal => goal.id !== id));
+    toast({ title: "Savings goal deleted" });
+  };
+
+  const deleteBudget = (id: string) => {
+    setBudgets(budgets.filter(budget => budget.id !== id));
+    toast({ title: "Budget deleted" });
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-subtle animate-fade-in">
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <div className="flex items-center gap-4 mb-8 animate-fade-in">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => navigate("/")}
+            className="hover-scale"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Button>
+          <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            Manage Goals & Budgets
+          </h1>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Savings Goals Section */}
+          <div className="space-y-6 animate-slide-in-left">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-semibold flex items-center gap-2">
+                <Target className="w-6 h-6 text-accent" />
+                Savings Goals
+              </h2>
+              <Dialog open={savingsDialogOpen} onOpenChange={setSavingsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="hover-scale">
+                    <PlusCircle className="w-4 h-4 mr-2" />
+                    Add Goal
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="animate-scale-in">
+                  <DialogHeader>
+                    <DialogTitle>Create New Savings Goal</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="goal-title">Goal Title</Label>
+                      <Input
+                        id="goal-title"
+                        placeholder="e.g., Dream House Fund"
+                        value={newSavings.title}
+                        onChange={(e) => setNewSavings({...newSavings, title: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="target-amount">Target Amount (IDR)</Label>
+                      <Input
+                        id="target-amount"
+                        type="number"
+                        placeholder="100000000"
+                        value={newSavings.targetAmount}
+                        onChange={(e) => setNewSavings({...newSavings, targetAmount: e.target.value})}
+                      />
+                    </div>
+                    <Button onClick={handleAddSavings} className="w-full">
+                      Create Goal
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="space-y-4">
+              {savingsGoals.map((goal, index) => (
+                <Card key={goal.id} className="shadow-card hover:shadow-elegant transition-all animate-card group" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center justify-between">
+                      <span className="text-lg">{goal.title}</span>
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm" className="hover-scale">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="hover-scale text-destructive hover:text-destructive"
+                          onClick={() => deleteSavings(goal.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Current</p>
+                        <p className="font-bold text-accent">{formatCurrency(goal.currentAmount)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Target</p>
+                        <p className="font-semibold">{formatCurrency(goal.targetAmount)}</p>
+                      </div>
+                    </div>
+                    <div className="mt-2 pt-2 border-t">
+                      <span className="text-sm text-muted-foreground">{goal.contributors} contributors</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Budgets Section */}
+          <div className="space-y-6 animate-slide-in-right">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-semibold flex items-center gap-2">
+                <Wallet className="w-6 h-6 text-primary" />
+                Budgets
+              </h2>
+              <Dialog open={budgetDialogOpen} onOpenChange={setBudgetDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="hover-scale">
+                    <PlusCircle className="w-4 h-4 mr-2" />
+                    Add Budget
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="animate-scale-in">
+                  <DialogHeader>
+                    <DialogTitle>Create New Budget</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="budget-title">Budget Title</Label>
+                      <Input
+                        id="budget-title"
+                        placeholder="e.g., Monthly Expenses"
+                        value={newBudget.title}
+                        onChange={(e) => setNewBudget({...newBudget, title: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="budget-amount">Budget Amount (IDR)</Label>
+                      <Input
+                        id="budget-amount"
+                        type="number"
+                        placeholder="5000000"
+                        value={newBudget.totalBudget}
+                        onChange={(e) => setNewBudget({...newBudget, totalBudget: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="budget-period">Period</Label>
+                      <Input
+                        id="budget-period"
+                        placeholder="e.g., January 2024"
+                        value={newBudget.period}
+                        onChange={(e) => setNewBudget({...newBudget, period: e.target.value})}
+                      />
+                    </div>
+                    <Button onClick={handleAddBudget} className="w-full">
+                      Create Budget
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="space-y-4">
+              {budgets.map((budget, index) => (
+                <Card key={budget.id} className="shadow-card hover:shadow-elegant transition-all animate-card group" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center justify-between">
+                      <span className="text-lg">{budget.title}</span>
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm" className="hover-scale">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="hover-scale text-destructive hover:text-destructive"
+                          onClick={() => deleteBudget(budget.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Spent</p>
+                        <p className="font-bold">{formatCurrency(budget.spent)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Remaining</p>
+                        <p className="font-semibold text-accent">{formatCurrency(budget.totalBudget - budget.spent)}</p>
+                      </div>
+                    </div>
+                    <div className="mt-2 pt-2 border-t">
+                      <span className="text-sm text-muted-foreground">{budget.period}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Manage;

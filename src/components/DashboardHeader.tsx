@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Scan, Wallet } from "lucide-react";
+import { PlusCircle, Scan, Wallet, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface DashboardHeaderProps {
   onAddSavings: () => void;
@@ -8,6 +9,7 @@ interface DashboardHeaderProps {
 }
 
 export const DashboardHeader = ({ onAddSavings, onAddExpense, onOCRUpload }: DashboardHeaderProps) => {
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
       <div className="animate-fade-in">
@@ -20,6 +22,16 @@ export const DashboardHeader = ({ onAddSavings, onAddExpense, onOCRUpload }: Das
       </div>
       
       <div className="flex flex-wrap gap-3 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+        <Button 
+          onClick={() => navigate("/manage")}
+          variant="outline"
+          className="border-primary/20 hover:bg-primary/5 hover-scale"
+          size="sm"
+        >
+          <Settings className="w-4 h-4 mr-2" />
+          Manage
+        </Button>
+        
         <Button 
           onClick={onAddSavings}
           className="bg-gradient-accent hover:shadow-glow transition-all hover-scale"

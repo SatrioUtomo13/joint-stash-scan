@@ -13,19 +13,48 @@ const Index = () => {
   const [transactionType, setTransactionType] = useState<"savings" | "expense">("savings");
 
   // Mock data - in real app this would come from backend
-  const savingsData = {
-    currentAmount: 45000000,
-    targetAmount: 100000000,
-    goalTitle: "Dream House Fund",
-    contributors: 4
-  };
+  const savingsGoals = [
+    {
+      id: "1",
+      currentAmount: 45000000,
+      targetAmount: 100000000,
+      goalTitle: "Dream House Fund",
+      contributors: 4
+    },
+    {
+      id: "2",
+      currentAmount: 15000000,
+      targetAmount: 50000000,
+      goalTitle: "Wedding Dream",
+      contributors: 2
+    },
+    {
+      id: "3",
+      currentAmount: 8000000,
+      targetAmount: 25000000,
+      goalTitle: "Car Fund",
+      contributors: 3
+    }
+  ];
 
-  const budgetData = {
-    totalBudget: 5000000,
-    spent: 3250000,
-    remaining: 1750000,
-    period: "January 2024"
-  };
+  const budgets = [
+    {
+      id: "1",
+      totalBudget: 5000000,
+      spent: 3250000,
+      remaining: 1750000,
+      period: "January 2024",
+      title: "Monthly Expenses"
+    },
+    {
+      id: "2",
+      totalBudget: 2000000,
+      spent: 800000,
+      remaining: 1200000,
+      period: "January 2024",
+      title: "Entertainment"
+    }
+  ];
 
   const handleAddTransaction = (type: "savings" | "expense") => {
     setTransactionType(type);
@@ -45,21 +74,38 @@ const Index = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in" 
-                 style={{ animationDelay: '0.1s' }}>
-              <div className="animate-card">
-                <SavingsCard {...savingsData} />
-              </div>
-              <div className="animate-card" style={{ animationDelay: '0.2s' }}>
-                <BudgetCard {...budgetData} />
+            {/* Savings Goals Grid */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Savings Goals</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 animate-fade-in" 
+                   style={{ animationDelay: '0.1s' }}>
+                {savingsGoals.map((goal, index) => (
+                  <div key={goal.id} className="animate-card" style={{ animationDelay: `${index * 0.1}s` }}>
+                    <SavingsCard {...goal} />
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+
+            {/* Budgets Grid */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Budgets</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in" 
+                   style={{ animationDelay: '0.2s' }}>
+                {budgets.map((budget, index) => (
+                  <div key={budget.id} className="animate-card" style={{ animationDelay: `${(index + savingsGoals.length) * 0.1}s` }}>
+                    <BudgetCard {...budget} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
               <TransactionHistory />
             </div>
           </div>
           
-          <div className="space-y-6 animate-slide-in-right" style={{ animationDelay: '0.4s' }}>
+          <div className="space-y-6 animate-slide-in-right" style={{ animationDelay: '0.5s' }}>
             <GroupMembers />
           </div>
         </div>
