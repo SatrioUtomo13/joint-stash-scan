@@ -135,4 +135,48 @@ All colors MUST be HSL.
   .animate-card {
     @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-elegant;
   }
+  
+  /* Enhanced mobile touch animations */
+  @media (hover: hover) {
+    .hover-scale:hover {
+      transform: scale(1.05);
+    }
+    
+    .hover-glow:hover {
+      box-shadow: var(--shadow-glow);
+    }
+  }
+
+  /* Mobile-friendly tap animations */
+  @media (hover: none) {
+    .hover-scale:active {
+      transform: scale(0.98);
+      transition: transform 0.1s ease-out;
+    }
+    
+    .animate-card:active {
+      transform: translateY(-2px) scale(1.01);
+    }
+    
+    button:active {
+      transform: scale(0.98);
+      transition: transform 0.1s ease-out;
+    }
+  }
+
+  /* Reduced motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-scale-in,
+    .animate-slide-in-right,
+    .animate-bounce-gentle,
+    .animate-pulse-glow,
+    .animate-card {
+      animation: none !important;
+    }
+    
+    * {
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
