@@ -6,11 +6,14 @@ import { TransactionHistory } from "@/components/TransactionHistory";
 import { AddTransactionModal } from "@/components/AddTransactionModal";
 import { OCRUploadModal } from "@/components/OCRUploadModal";
 import { GroupMembers } from "@/components/GroupMembers";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const Index = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isOCRModalOpen, setIsOCRModalOpen] = useState(false);
   const [transactionType, setTransactionType] = useState<"savings" | "expense">("savings");
+  const [selectedGoalMembers, setSelectedGoalMembers] = useState<string | null>(null);
+  const [selectedBudgetMembers, setSelectedBudgetMembers] = useState<string | null>(null);
 
   // Mock data - in real app this would come from backend
   const savingsGoals = [
@@ -72,41 +75,39 @@ const Index = () => {
           />
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-2 space-y-6">
-            {/* Savings Goals Grid */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Savings Goals</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 animate-fade-in" 
-                   style={{ animationDelay: '0.1s' }}>
-                {savingsGoals.map((goal, index) => (
-                  <div key={goal.id} className="animate-card" style={{ animationDelay: `${index * 0.1}s` }}>
+        <div className="space-y-6">
+          {/* Savings Goals Grid */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Savings Goals</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 animate-fade-in" 
+                 style={{ animationDelay: '0.1s' }}>
+              {savingsGoals.map((goal, index) => (
+                <div key={goal.id} className="animate-card" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <div onClick={() => setSelectedGoalMembers(goal.id)} className="cursor-pointer">
                     <SavingsCard {...goal} />
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Budgets Grid */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Budgets</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in" 
-                   style={{ animationDelay: '0.2s' }}>
-                {budgets.map((budget, index) => (
-                  <div key={budget.id} className="animate-card" style={{ animationDelay: `${(index + savingsGoals.length) * 0.1}s` }}>
-                    <BudgetCard {...budget} />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
-              <TransactionHistory />
+                </div>
+              ))}
             </div>
           </div>
-          
-          <div className="space-y-6 animate-slide-in-right" style={{ animationDelay: '0.5s' }}>
-            <GroupMembers />
+
+          {/* Budgets Grid */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Budgets</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in" 
+                 style={{ animationDelay: '0.2s' }}>
+              {budgets.map((budget, index) => (
+                <div key={budget.id} className="animate-card" style={{ animationDelay: `${(index + savingsGoals.length) * 0.1}s` }}>
+                  <div onClick={() => setSelectedBudgetMembers(budget.id)} className="cursor-pointer">
+                    <BudgetCard {...budget} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <TransactionHistory />
           </div>
         </div>
         
@@ -120,6 +121,30 @@ const Index = () => {
           isOpen={isOCRModalOpen}
           onClose={() => setIsOCRModalOpen(false)}
         />
+
+        {/* Group Members Modal for Savings Goals */}
+        <Dialog open={!!selectedGoalMembers} onOpenChange={() => setSelectedGoalMembers(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                {selectedGoalMembers && savingsGoals.find(g => g.id === selectedGoalMembers)?.goalTitle} - Members
+              </DialogTitle>
+            </DialogHeader>
+            <GroupMembers />
+          </DialogContent>
+        </Dialog>
+
+        {/* Group Members Modal for Budgets */}
+        <Dialog open={!!selectedBudgetMembers} onOpenChange={() => setSelectedBudgetMembers(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                {selectedBudgetMembers && budgets.find(b => b.id === selectedBudgetMembers)?.title} - Members
+              </DialogTitle>
+            </DialogHeader>
+            <GroupMembers />
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

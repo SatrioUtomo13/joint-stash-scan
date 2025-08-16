@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, FileImage, Loader2, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,15 @@ interface ExtractedData {
   merchant?: string;
 }
 
+// Mock budget data - in real app this would come from backend
+const mockBudgets = [
+  { id: "1", title: "Monthly Expenses" },
+  { id: "2", title: "Entertainment" },
+  { id: "3", title: "Food & Dining" },
+  { id: "4", title: "Transportation" },
+  { id: "5", title: "Shopping" }
+];
+
 export const OCRUploadModal = ({ isOpen, onClose }: OCRUploadModalProps) => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -26,6 +36,7 @@ export const OCRUploadModal = ({ isOpen, onClose }: OCRUploadModalProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [extractedData, setExtractedData] = useState<ExtractedData | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedBudget, setSelectedBudget] = useState<string>("");
 
   const handleFileSelect = (file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -95,6 +106,7 @@ export const OCRUploadModal = ({ isOpen, onClose }: OCRUploadModalProps) => {
     setSelectedFile(null);
     setExtractedData(null);
     setIsProcessing(false);
+    setSelectedBudget("");
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -218,6 +230,23 @@ export const OCRUploadModal = ({ isOpen, onClose }: OCRUploadModalProps) => {
                         />
                       </div>
                     )}
+
+                    {/* Budget Selection */}
+                    <div>
+                      <Label htmlFor="budget-select">Assign to Budget</Label>
+                      <Select value={selectedBudget} onValueChange={setSelectedBudget}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select budget category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {mockBudgets.map((budget) => (
+                            <SelectItem key={budget.id} value={budget.id}>
+                              {budget.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
               )}
