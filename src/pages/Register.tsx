@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Eye, EyeOff, ArrowRight, Wallet, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+import { register } from "@/services/auth";
+
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -48,32 +50,20 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
 
-    // Simulate API call to your database
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Here you would call your own API endpoint
-      // const response = await fetch('your-api-endpoint/register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     name: formData.name,
-      //     email: formData.email,
-      //     password: formData.password
-      //   })
-      // });
-      
+      const res = await register(formData.name, formData.email, formData.password);
+      console.log(res);
+
       toast({
         title: "Account created successfully!",
         description: "Welcome to JointStash. You can now start saving together.",
       });
-      
-      // Navigate to dashboard or login (you'll handle this with your auth state)
+
     } catch (error) {
       toast({
         title: "Registration failed",
@@ -99,7 +89,7 @@ const Register = () => {
             </div>
           </div>
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            JointStash
+            Dompet Kita
           </h1>
           <p className="text-muted-foreground mt-2">
             Start saving together today
@@ -143,7 +133,7 @@ const Register = () => {
                   className="transition-all duration-300 focus:scale-[1.02] focus:shadow-md"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -173,9 +163,8 @@ const Register = () => {
                 </div>
                 {formData.password && (
                   <div className="flex items-center gap-2 text-xs">
-                    <div className={`transition-colors duration-300 ${
-                      passwordStrength ? 'text-green-600' : 'text-muted-foreground'
-                    }`}>
+                    <div className={`transition-colors duration-300 ${passwordStrength ? 'text-green-600' : 'text-muted-foreground'
+                      }`}>
                       {passwordStrength && <Check className="h-3 w-3 inline mr-1" />}
                       At least 6 characters
                     </div>
@@ -212,9 +201,8 @@ const Register = () => {
                 </div>
                 {formData.confirmPassword && (
                   <div className="flex items-center gap-2 text-xs">
-                    <div className={`transition-colors duration-300 ${
-                      passwordsMatch ? 'text-green-600' : 'text-muted-foreground'
-                    }`}>
+                    <div className={`transition-colors duration-300 ${passwordsMatch ? 'text-green-600' : 'text-muted-foreground'
+                      }`}>
                       {passwordsMatch && <Check className="h-3 w-3 inline mr-1" />}
                       Passwords match
                     </div>

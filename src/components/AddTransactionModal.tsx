@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { getSavingsGoals } from "@/services/goal";
+import { savingGoalsDropdown } from "@/services/dropdown";
+
 
 interface AddTransactionModalProps {
   isOpen: boolean;
@@ -16,7 +19,7 @@ interface AddTransactionModalProps {
 
 const expenseCategories = [
   "Food & Dining",
-  "Transportation", 
+  "Transportation",
   "Shopping",
   "Entertainment",
   "Bills & Utilities",
@@ -31,10 +34,26 @@ export const AddTransactionModal = ({ isOpen, onClose, type }: AddTransactionMod
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [goalOptions, setGoalOptions] = useState<{ id: number, title: string }[]>([])
+  const [selectedGoal, setSelectedGoal] = useState("");
+
+  const fetchGoals = async () => {
+    try {
+      const response = await savingGoalsDropdown()
+      setGoalOptions(response)
+
+    } catch (error) {
+      console.error("Error fetching savings goals:", error)
+    }
+  }
+
+  useEffect(() => {
+    fetchGoals()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!amount || !description) {
       toast({
         title: "Missing Information",
@@ -45,15 +64,18 @@ export const AddTransactionModal = ({ isOpen, onClose, type }: AddTransactionMod
     }
 
     setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
+    try {
+      // const response = await 
+    } catch (error) {
+
+    }
+
     toast({
       title: "Transaction Added",
       description: `${type === "savings" ? "Savings" : "Expense"} recorded successfully`,
     });
-    
+
     setIsSubmitting(false);
     setAmount("");
     setDescription("");
@@ -64,7 +86,7 @@ export const AddTransactionModal = ({ isOpen, onClose, type }: AddTransactionMod
   const formatCurrency = (value: string) => {
     const numericValue = value.replace(/[^\d]/g, '');
     if (!numericValue) return '';
-    
+
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
       currency: 'IDR',
@@ -85,9 +107,26 @@ export const AddTransactionModal = ({ isOpen, onClose, type }: AddTransactionMod
             Add {type === "savings" ? "Savings" : "Expense"}
           </DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
+            {type === "savings" && (
+              <div>
+                <Label htmlFor="goal">Goal</Label>
+                <Select value={selectedGoal} onValueChange={setSelectedGoal}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {goalOptions.map((opt) => (
+                      <SelectItem key={opt.id} value={opt.id.toString()}>
+                        {opt.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <Label htmlFor="amount">Amount (IDR) *</Label>
             <Input
               id="amount"
@@ -103,19 +142,21 @@ export const AddTransactionModal = ({ isOpen, onClose, type }: AddTransactionMod
               </p>
             )}
           </div>
-          
-          <div>
-            <Label htmlFor="description">Description *</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={`Enter ${type} description`}
-              className="mt-1"
-              rows={3}
-            />
-          </div>
-          
+
+          {type === "expense" && (
+            <div>
+              <Label htmlFor="description">Description *</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder={`Enter ${type} description`}
+                className="mt-1"
+                rows={3}
+              />
+            </div>
+          )}
+
           {type === "expense" && (
             <div>
               <Label htmlFor="category">Category</Label>
@@ -133,7 +174,7 @@ export const AddTransactionModal = ({ isOpen, onClose, type }: AddTransactionMod
               </Select>
             </div>
           )}
-          
+
           <div className="flex gap-3 pt-4">
             <Button
               type="button"
@@ -146,11 +187,10 @@ export const AddTransactionModal = ({ isOpen, onClose, type }: AddTransactionMod
             <Button
               type="submit"
               disabled={isSubmitting}
-              className={`flex-1 ${
-                type === "savings" 
-                  ? "bg-gradient-accent hover:shadow-glow" 
-                  : "bg-gradient-primary hover:shadow-elegant"
-              }`}
+              className={`flex-1 ${type === "savings"
+                ? "bg-gradient-accent hover:shadow-glow"
+                : "bg-gradient-primary hover:shadow-elegant"
+                }`}
             >
               {isSubmitting ? "Adding..." : `Add ${type === "savings" ? "Savings" : "Expense"}`}
             </Button>

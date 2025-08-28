@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,11 +12,13 @@ import { useToast } from "@/components/ui/use-toast";
 import { AddTransactionModal } from "@/components/AddTransactionModal";
 import { OCRUploadModal } from "@/components/OCRUploadModal";
 
+import { createSavingsGoal, getSavingsGoals } from "@/services/goal";
+
 interface SavingsGoal {
   id: string;
   title: string;
   currentAmount: number;
-  targetAmount: number;
+  target: number;
   contributors: number;
 }
 
@@ -31,21 +33,21 @@ interface Budget {
 const Manage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   // Mock data - in real app this would come from backend
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([
     {
       id: "1",
       title: "Dream House Fund",
       currentAmount: 45000000,
-      targetAmount: 100000000,
+      target: 100000000,
       contributors: 4
     },
     {
-      id: "2", 
+      id: "2",
       title: "Wedding Dream",
       currentAmount: 15000000,
-      targetAmount: 50000000,
+      target: 50000000,
       contributors: 2
     }
   ]);
@@ -60,17 +62,22 @@ const Manage = () => {
     },
     {
       id: "2",
-      title: "Entertainment Budget", 
+      title: "Entertainment Budget",
       totalBudget: 2000000,
       spent: 800000,
       period: "January 2024"
     }
   ]);
 
-  const [newSavings, setNewSavings] = useState({ title: "", targetAmount: "" });
+  const [newSavings, setNewSavings] = useState({ title: "", target: "", description: "", members: [] as string[] });
+  const [savingsData, setSavingsData] = useState([])
+
+  const [memberInput, setMemberInput] = useState("");
   const [newBudget, setNewBudget] = useState({ title: "", totalBudget: "", period: "" });
+
   const [savingsDialogOpen, setSavingsDialogOpen] = useState(false);
   const [budgetDialogOpen, setBudgetDialogOpen] = useState(false);
+
   const [addSavingsModalOpen, setAddSavingsModalOpen] = useState(false);
   const [addExpenseModalOpen, setAddExpenseModalOpen] = useState(false);
   const [ocrModalOpen, setOcrModalOpen] = useState(false);
@@ -83,26 +90,77 @@ const Manage = () => {
     }).format(amount);
   };
 
-  const handleAddSavings = () => {
-    if (!newSavings.title || !newSavings.targetAmount) return;
-    
-    const savings: SavingsGoal = {
-      id: Date.now().toString(),
+  const fetchSavingsGoals = async () => {
+    try {
+      const response = await getSavingsGoals()
+      setSavingsData(response)
+    } catch (error) {
+      toast({ title: "Error fetching savings goals", variant: "destructive" });
+    }
+  }
+
+  useEffect(() => {
+    fetchSavingsGoals();
+  }, [])
+
+  const handleAddMember = () => {
+    if (memberInput.trim() !== "") {
+      setNewSavings({
+        ...newSavings,
+        members: [...newSavings.members, memberInput.trim()],
+      });
+      setMemberInput(""); // reset input
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === "," || e.key === "Tab") {
+      e.preventDefault();
+      if (memberInput.trim() !== "") {
+        setNewSavings({
+          ...newSavings,
+          members: [...newSavings.members, memberInput.trim()],
+        });
+        setMemberInput("");
+      }
+    }
+  };
+
+  const handleAddGoal = async () => {
+    if (!newSavings.title) {
+      toast({ title: "Please enter a title for the savings goal.", variant: "destructive" });
+      return
+    } else if (!newSavings.target) {
+      toast({ title: "Please enter a target amount for the savings goal.", variant: "destructive" });
+      return
+    } else if (newSavings.members.length === 0) {
+      toast({ title: "Please enter at least one member for the savings goal.", variant: "destructive" });
+      return
+    }
+
+    if (!newSavings.title || !newSavings.target) return;
+    const payload = {
       title: newSavings.title,
-      currentAmount: 0,
-      targetAmount: parseInt(newSavings.targetAmount),
-      contributors: 1
-    };
-    
-    setSavingsGoals([...savingsGoals, savings]);
-    setNewSavings({ title: "", targetAmount: "" });
-    setSavingsDialogOpen(false);
-    toast({ title: "Savings goal created successfully!" });
+      target: parseInt(newSavings.target),
+      description: newSavings.description,
+      members: newSavings.members
+    }
+    try {
+      const response = await createSavingsGoal(payload);
+      if (response) {
+        setNewSavings({ title: "", target: "", description: "", members: [] });
+        setSavingsDialogOpen(false);
+        toast({ title: "Savings goal created successfully!" });
+        fetchSavingsGoals();
+      }
+    } catch (error) {
+      toast({ title: "Error creating savings goal", variant: "destructive" });
+    }
   };
 
   const handleAddBudget = () => {
     if (!newBudget.title || !newBudget.totalBudget || !newBudget.period) return;
-    
+
     const budget: Budget = {
       id: Date.now().toString(),
       title: newBudget.title,
@@ -110,7 +168,7 @@ const Manage = () => {
       spent: 0,
       period: newBudget.period
     };
-    
+
     setBudgets([...budgets, budget]);
     setNewBudget({ title: "", totalBudget: "", period: "" });
     setBudgetDialogOpen(false);
@@ -131,8 +189,8 @@ const Manage = () => {
     <div className="min-h-screen bg-gradient-subtle animate-fade-in">
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         <div className="flex items-center gap-4 mb-8 animate-fade-in">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="sm"
             onClick={() => navigate("/")}
             className="hover-scale"
@@ -147,15 +205,15 @@ const Manage = () => {
 
         {/* Quick Actions Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <Button 
+          <Button
             onClick={() => setAddSavingsModalOpen(true)}
             className="h-20 flex-col gap-2 bg-gradient-accent hover:shadow-glow hover-scale"
           >
             <Plus className="w-6 h-6" />
             Add Savings
           </Button>
-          
-          <Button 
+
+          <Button
             onClick={() => setAddExpenseModalOpen(true)}
             variant="outline"
             className="h-20 flex-col gap-2 border-primary/20 hover:bg-primary/5 hover:text-primary hover-scale"
@@ -163,8 +221,8 @@ const Manage = () => {
             <Wallet className="w-6 h-6" />
             Add Expense
           </Button>
-          
-          <Button 
+
+          <Button
             onClick={() => setOcrModalOpen(true)}
             variant="secondary"
             className="h-20 flex-col gap-2 hover-scale hover-glow"
@@ -200,7 +258,7 @@ const Manage = () => {
                         id="goal-title"
                         placeholder="e.g., Dream House Fund"
                         value={newSavings.title}
-                        onChange={(e) => setNewSavings({...newSavings, title: e.target.value})}
+                        onChange={(e) => setNewSavings({ ...newSavings, title: e.target.value })}
                       />
                     </div>
                     <div>
@@ -209,11 +267,67 @@ const Manage = () => {
                         id="target-amount"
                         type="number"
                         placeholder="100000000"
-                        value={newSavings.targetAmount}
-                        onChange={(e) => setNewSavings({...newSavings, targetAmount: e.target.value})}
+                        value={newSavings.target}
+                        onChange={(e) => setNewSavings({ ...newSavings, target: e.target.value })}
+                      />
+                      {newSavings.target && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {formatCurrency(parseInt(newSavings.target))}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <Label htmlFor="description">Description (Optional)</Label>
+                      <Textarea
+                        id="description"
+                        value={newSavings.description}
+                        onChange={(e) => setNewSavings({ ...newSavings, description: e.target.value })}
+                        placeholder={`Enter description`}
+                        className="mt-1"
+                        rows={3}
                       />
                     </div>
-                    <Button onClick={handleAddSavings} className="w-full">
+                    <div>
+                      <Label htmlFor="members">Add Members</Label>
+                      <div className="flex space-x-2">
+                        <Input
+                          id="members"
+                          type="email"
+                          placeholder="Enter member email"
+                          value={memberInput}
+                          onChange={(e) => setMemberInput(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                        />
+                        <Button onClick={handleAddMember}>
+                          Add
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* tampilkan email yang sudah ditambahkan */}
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {newSavings.members.map((email, idx) => (
+                        <span
+                          key={idx}
+                          className="flex items-center gap-2 px-3 py-1 bg-gray-200 rounded-full text-sm"
+                        >
+                          {email}
+                          <button
+                            type="button"
+                            className="flex justify-center w-5 h-5 rounded-full bg-red-500 text-white text-xs hover:bg-red-600"
+                            onClick={() => {
+                              setNewSavings({
+                                ...newSavings,
+                                members: newSavings.members.filter((_, i) => i !== idx),
+                              });
+                            }}
+                          >
+                            x
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                    <Button onClick={handleAddGoal} className="w-full">
                       Create Goal
                     </Button>
                   </div>
@@ -222,7 +336,7 @@ const Manage = () => {
             </div>
 
             <div className="space-y-4">
-              {savingsGoals.map((goal, index) => (
+              {savingsData.map((goal, index) => (
                 <Card key={goal.id} className="shadow-card hover:shadow-elegant transition-all animate-card group" style={{ animationDelay: `${index * 0.1}s` }}>
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center justify-between">
@@ -231,9 +345,9 @@ const Manage = () => {
                         <Button variant="ghost" size="sm" className="hover-scale">
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className="hover-scale text-destructive hover:text-destructive"
                           onClick={() => deleteSavings(goal.id)}
                         >
@@ -246,15 +360,15 @@ const Manage = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm text-muted-foreground">Current</p>
-                        <p className="font-bold text-accent">{formatCurrency(goal.currentAmount)}</p>
+                        <p className="font-bold text-accent">{formatCurrency(goal.current_target)}</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Target</p>
-                        <p className="font-semibold">{formatCurrency(goal.targetAmount)}</p>
+                        <p className="font-semibold">{formatCurrency(goal.target)}</p>
                       </div>
                     </div>
                     <div className="mt-2 pt-2 border-t">
-                      <span className="text-sm text-muted-foreground">{goal.contributors} contributors</span>
+                      <span className="text-sm text-muted-foreground">{goal.members.length} contributors</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -287,7 +401,7 @@ const Manage = () => {
                         id="budget-title"
                         placeholder="e.g., Monthly Expenses"
                         value={newBudget.title}
-                        onChange={(e) => setNewBudget({...newBudget, title: e.target.value})}
+                        onChange={(e) => setNewBudget({ ...newBudget, title: e.target.value })}
                       />
                     </div>
                     <div>
@@ -297,7 +411,7 @@ const Manage = () => {
                         type="number"
                         placeholder="5000000"
                         value={newBudget.totalBudget}
-                        onChange={(e) => setNewBudget({...newBudget, totalBudget: e.target.value})}
+                        onChange={(e) => setNewBudget({ ...newBudget, totalBudget: e.target.value })}
                       />
                     </div>
                     <div>
@@ -306,7 +420,7 @@ const Manage = () => {
                         id="budget-period"
                         placeholder="e.g., January 2024"
                         value={newBudget.period}
-                        onChange={(e) => setNewBudget({...newBudget, period: e.target.value})}
+                        onChange={(e) => setNewBudget({ ...newBudget, period: e.target.value })}
                       />
                     </div>
                     <Button onClick={handleAddBudget} className="w-full">
@@ -327,9 +441,9 @@ const Manage = () => {
                         <Button variant="ghost" size="sm" className="hover-scale">
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className="hover-scale text-destructive hover:text-destructive"
                           onClick={() => deleteBudget(budget.id)}
                         >
@@ -359,20 +473,20 @@ const Manage = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Modals */}
       <AddTransactionModal
         isOpen={addSavingsModalOpen}
         onClose={() => setAddSavingsModalOpen(false)}
         type="savings"
       />
-      
+
       <AddTransactionModal
         isOpen={addExpenseModalOpen}
         onClose={() => setAddExpenseModalOpen(false)}
         type="expense"
       />
-      
+
       <OCRUploadModal
         isOpen={ocrModalOpen}
         onClose={() => setOcrModalOpen(false)}

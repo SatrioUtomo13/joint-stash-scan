@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,7 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Eye, EyeOff, ArrowRight, Wallet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+import { login } from "@/services/auth";
+
 const Login = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -27,23 +30,17 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call to your database
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Here you would call your own API endpoint
-      // const response = await fetch('your-api-endpoint/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
-      
+      const res = await login(formData.email, formData.password)
+      localStorage.setItem("token", res.access_token)
+
       toast({
         title: "Login successful!",
-        description: "Welcome back to JointStash",
+        description: "Welcome back to Dompet Kita",
       });
-      
-      // Navigate to dashboard (you'll handle this with your auth state)
+
+      navigate("/");
+
     } catch (error) {
       toast({
         title: "Login failed",
@@ -66,7 +63,7 @@ const Login = () => {
             </div>
           </div>
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            JointStash
+            Dompet Kita
           </h1>
           <p className="text-muted-foreground mt-2">
             Your shared financial companion
@@ -96,7 +93,7 @@ const Login = () => {
                   className="transition-all duration-300 focus:scale-[1.02] focus:shadow-md"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">

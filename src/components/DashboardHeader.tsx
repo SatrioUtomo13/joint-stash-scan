@@ -14,15 +14,15 @@ export const DashboardHeader = ({ onAddSavings, onAddExpense, onOCRUpload }: Das
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
       <div className="animate-fade-in">
         <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-          Joint Savings
+          Dompet Kita
         </h1>
         <p className="text-muted-foreground mt-1">
           Track your group's financial goals together
         </p>
       </div>
-      
+
       <div className="flex flex-wrap gap-3 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-        <Button 
+        <Button
           onClick={() => navigate("/manage")}
           variant="outline"
           className="border-primary/20 hover:bg-primary/5 hover:text-primary hover-scale"
@@ -31,8 +31,8 @@ export const DashboardHeader = ({ onAddSavings, onAddExpense, onOCRUpload }: Das
           <Settings className="w-4 h-4 mr-2" />
           Manage
         </Button>
-        
-        <Button 
+
+        <Button
           onClick={onAddSavings}
           className="bg-gradient-accent hover:shadow-glow transition-all hover-scale"
           size="sm"
@@ -40,8 +40,8 @@ export const DashboardHeader = ({ onAddSavings, onAddExpense, onOCRUpload }: Das
           <PlusCircle className="w-4 h-4 mr-2 animate-bounce-gentle" />
           Add Savings
         </Button>
-        
-        <Button 
+
+        <Button
           onClick={onAddExpense}
           variant="outline"
           className="border-primary/20 hover:bg-primary/5 hover:text-primary hover-scale"
@@ -50,8 +50,8 @@ export const DashboardHeader = ({ onAddSavings, onAddExpense, onOCRUpload }: Das
           <Wallet className="w-4 h-4 mr-2" />
           Add Expense
         </Button>
-        
-        <Button 
+
+        <Button
           onClick={onOCRUpload}
           variant="secondary"
           className="bg-secondary hover:bg-secondary/80 hover-scale hover-glow"
