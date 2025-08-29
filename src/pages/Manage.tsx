@@ -3,10 +3,31 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlusCircle, Target, Wallet, Edit, Trash2, ArrowLeft, Scan, Plus } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  PlusCircle,
+  Target,
+  Wallet,
+  Edit,
+  Trash2,
+  ArrowLeft,
+  Scan,
+  Plus,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { AddTransactionModal } from "@/components/AddTransactionModal";
@@ -41,15 +62,15 @@ const Manage = () => {
       title: "Dream House Fund",
       currentAmount: 45000000,
       target: 100000000,
-      contributors: 4
+      contributors: 4,
     },
     {
       id: "2",
       title: "Wedding Dream",
       currentAmount: 15000000,
       target: 50000000,
-      contributors: 2
-    }
+      contributors: 2,
+    },
   ]);
 
   const [budgets, setBudgets] = useState<Budget[]>([
@@ -58,22 +79,31 @@ const Manage = () => {
       title: "Monthly Expenses",
       totalBudget: 5000000,
       spent: 3250000,
-      period: "January 2024"
+      period: "January 2024",
     },
     {
       id: "2",
       title: "Entertainment Budget",
       totalBudget: 2000000,
       spent: 800000,
-      period: "January 2024"
-    }
+      period: "January 2024",
+    },
   ]);
 
-  const [newSavings, setNewSavings] = useState({ title: "", target: "", description: "", members: [] as string[] });
-  const [savingsData, setSavingsData] = useState([])
+  const [newSavings, setNewSavings] = useState({
+    title: "",
+    target: "",
+    description: "",
+    members: [] as string[],
+  });
+  const [savingsData, setSavingsData] = useState([]);
 
   const [memberInput, setMemberInput] = useState("");
-  const [newBudget, setNewBudget] = useState({ title: "", totalBudget: "", period: "" });
+  const [newBudget, setNewBudget] = useState({
+    title: "",
+    totalBudget: "",
+    period: "",
+  });
 
   const [savingsDialogOpen, setSavingsDialogOpen] = useState(false);
   const [budgetDialogOpen, setBudgetDialogOpen] = useState(false);
@@ -83,25 +113,25 @@ const Manage = () => {
   const [ocrModalOpen, setOcrModalOpen] = useState(false);
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
   const fetchSavingsGoals = async () => {
     try {
-      const response = await getSavingsGoals()
-      setSavingsData(response)
+      const response = await getSavingsGoals();
+      setSavingsData(response);
     } catch (error) {
       toast({ title: "Error fetching savings goals", variant: "destructive" });
     }
-  }
+  };
 
   useEffect(() => {
     fetchSavingsGoals();
-  }, [])
+  }, []);
 
   const handleAddMember = () => {
     if (memberInput.trim() !== "") {
@@ -128,14 +158,17 @@ const Manage = () => {
 
   const handleAddGoal = async () => {
     if (!newSavings.title) {
-      toast({ title: "Please enter a title for the savings goal.", variant: "destructive" });
-      return
+      toast({
+        title: "Please enter a title for the savings goal.",
+        variant: "destructive",
+      });
+      return;
     } else if (!newSavings.target) {
-      toast({ title: "Please enter a target amount for the savings goal.", variant: "destructive" });
-      return
-    } else if (newSavings.members.length === 0) {
-      toast({ title: "Please enter at least one member for the savings goal.", variant: "destructive" });
-      return
+      toast({
+        title: "Please enter a target amount for the savings goal.",
+        variant: "destructive",
+      });
+      return;
     }
 
     if (!newSavings.title || !newSavings.target) return;
@@ -143,8 +176,8 @@ const Manage = () => {
       title: newSavings.title,
       target: parseInt(newSavings.target),
       description: newSavings.description,
-      members: newSavings.members
-    }
+      members: newSavings.members,
+    };
     try {
       const response = await createSavingsGoal(payload);
       if (response) {
@@ -166,7 +199,7 @@ const Manage = () => {
       title: newBudget.title,
       totalBudget: parseInt(newBudget.totalBudget),
       spent: 0,
-      period: newBudget.period
+      period: newBudget.period,
     };
 
     setBudgets([...budgets, budget]);
@@ -176,12 +209,12 @@ const Manage = () => {
   };
 
   const deleteSavings = (id: string) => {
-    setSavingsGoals(savingsGoals.filter(goal => goal.id !== id));
+    setSavingsGoals(savingsGoals.filter((goal) => goal.id !== id));
     toast({ title: "Savings goal deleted" });
   };
 
   const deleteBudget = (id: string) => {
-    setBudgets(budgets.filter(budget => budget.id !== id));
+    setBudgets(budgets.filter((budget) => budget.id !== id));
     toast({ title: "Budget deleted" });
   };
 
@@ -204,7 +237,10 @@ const Manage = () => {
         </div>
 
         {/* Quick Actions Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+        <div
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 animate-fade-in"
+          style={{ animationDelay: "0.2s" }}
+        >
           <Button
             onClick={() => setAddSavingsModalOpen(true)}
             className="h-20 flex-col gap-2 bg-gradient-accent hover:shadow-glow hover-scale"
@@ -240,7 +276,10 @@ const Manage = () => {
                 <Target className="w-6 h-6 text-accent" />
                 Savings Goals
               </h2>
-              <Dialog open={savingsDialogOpen} onOpenChange={setSavingsDialogOpen}>
+              <Dialog
+                open={savingsDialogOpen}
+                onOpenChange={setSavingsDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button className="hover-scale">
                     <PlusCircle className="w-4 h-4 mr-2" />
@@ -258,7 +297,12 @@ const Manage = () => {
                         id="goal-title"
                         placeholder="e.g., Dream House Fund"
                         value={newSavings.title}
-                        onChange={(e) => setNewSavings({ ...newSavings, title: e.target.value })}
+                        onChange={(e) =>
+                          setNewSavings({
+                            ...newSavings,
+                            title: e.target.value,
+                          })
+                        }
                       />
                     </div>
                     <div>
@@ -268,7 +312,12 @@ const Manage = () => {
                         type="number"
                         placeholder="100000000"
                         value={newSavings.target}
-                        onChange={(e) => setNewSavings({ ...newSavings, target: e.target.value })}
+                        onChange={(e) =>
+                          setNewSavings({
+                            ...newSavings,
+                            target: e.target.value,
+                          })
+                        }
                       />
                       {newSavings.target && (
                         <p className="text-sm text-muted-foreground mt-1">
@@ -277,11 +326,18 @@ const Manage = () => {
                       )}
                     </div>
                     <div>
-                      <Label htmlFor="description">Description (Optional)</Label>
+                      <Label htmlFor="description">
+                        Description (Optional)
+                      </Label>
                       <Textarea
                         id="description"
                         value={newSavings.description}
-                        onChange={(e) => setNewSavings({ ...newSavings, description: e.target.value })}
+                        onChange={(e) =>
+                          setNewSavings({
+                            ...newSavings,
+                            description: e.target.value,
+                          })
+                        }
                         placeholder={`Enter description`}
                         className="mt-1"
                         rows={3}
@@ -298,9 +354,7 @@ const Manage = () => {
                           onChange={(e) => setMemberInput(e.target.value)}
                           onKeyDown={handleKeyDown}
                         />
-                        <Button onClick={handleAddMember}>
-                          Add
-                        </Button>
+                        <Button onClick={handleAddMember}>Add</Button>
                       </div>
                     </div>
 
@@ -318,7 +372,9 @@ const Manage = () => {
                             onClick={() => {
                               setNewSavings({
                                 ...newSavings,
-                                members: newSavings.members.filter((_, i) => i !== idx),
+                                members: newSavings.members.filter(
+                                  (_, i) => i !== idx
+                                ),
                               });
                             }}
                           >
@@ -337,12 +393,20 @@ const Manage = () => {
 
             <div className="space-y-4">
               {savingsData.map((goal, index) => (
-                <Card key={goal.id} className="shadow-card hover:shadow-elegant transition-all animate-card group" style={{ animationDelay: `${index * 0.1}s` }}>
+                <Card
+                  key={goal.id}
+                  className="shadow-card hover:shadow-elegant transition-all animate-card group"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center justify-between">
                       <span className="text-lg">{goal.title}</span>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" className="hover-scale">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="hover-scale"
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button
@@ -360,15 +424,21 @@ const Manage = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm text-muted-foreground">Current</p>
-                        <p className="font-bold text-accent">{formatCurrency(goal.current_target)}</p>
+                        <p className="font-bold text-accent">
+                          {formatCurrency(goal.current_target)}
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Target</p>
-                        <p className="font-semibold">{formatCurrency(goal.target)}</p>
+                        <p className="font-semibold">
+                          {formatCurrency(goal.target)}
+                        </p>
                       </div>
                     </div>
                     <div className="mt-2 pt-2 border-t">
-                      <span className="text-sm text-muted-foreground">{goal.members.length} contributors</span>
+                      <span className="text-sm text-muted-foreground">
+                        {goal.members.length} contributors
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
@@ -383,7 +453,10 @@ const Manage = () => {
                 <Wallet className="w-6 h-6 text-primary" />
                 Budgets
               </h2>
-              <Dialog open={budgetDialogOpen} onOpenChange={setBudgetDialogOpen}>
+              <Dialog
+                open={budgetDialogOpen}
+                onOpenChange={setBudgetDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button variant="outline" className="hover-scale">
                     <PlusCircle className="w-4 h-4 mr-2" />
@@ -401,7 +474,9 @@ const Manage = () => {
                         id="budget-title"
                         placeholder="e.g., Monthly Expenses"
                         value={newBudget.title}
-                        onChange={(e) => setNewBudget({ ...newBudget, title: e.target.value })}
+                        onChange={(e) =>
+                          setNewBudget({ ...newBudget, title: e.target.value })
+                        }
                       />
                     </div>
                     <div>
@@ -411,7 +486,12 @@ const Manage = () => {
                         type="number"
                         placeholder="5000000"
                         value={newBudget.totalBudget}
-                        onChange={(e) => setNewBudget({ ...newBudget, totalBudget: e.target.value })}
+                        onChange={(e) =>
+                          setNewBudget({
+                            ...newBudget,
+                            totalBudget: e.target.value,
+                          })
+                        }
                       />
                     </div>
                     <div>
@@ -420,7 +500,9 @@ const Manage = () => {
                         id="budget-period"
                         placeholder="e.g., January 2024"
                         value={newBudget.period}
-                        onChange={(e) => setNewBudget({ ...newBudget, period: e.target.value })}
+                        onChange={(e) =>
+                          setNewBudget({ ...newBudget, period: e.target.value })
+                        }
                       />
                     </div>
                     <Button onClick={handleAddBudget} className="w-full">
@@ -433,12 +515,20 @@ const Manage = () => {
 
             <div className="space-y-4">
               {budgets.map((budget, index) => (
-                <Card key={budget.id} className="shadow-card hover:shadow-elegant transition-all animate-card group" style={{ animationDelay: `${index * 0.1}s` }}>
+                <Card
+                  key={budget.id}
+                  className="shadow-card hover:shadow-elegant transition-all animate-card group"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center justify-between">
                       <span className="text-lg">{budget.title}</span>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" className="hover-scale">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="hover-scale"
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button
@@ -456,15 +546,23 @@ const Manage = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm text-muted-foreground">Spent</p>
-                        <p className="font-bold">{formatCurrency(budget.spent)}</p>
+                        <p className="font-bold">
+                          {formatCurrency(budget.spent)}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Remaining</p>
-                        <p className="font-semibold text-accent">{formatCurrency(budget.totalBudget - budget.spent)}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Remaining
+                        </p>
+                        <p className="font-semibold text-accent">
+                          {formatCurrency(budget.totalBudget - budget.spent)}
+                        </p>
                       </div>
                     </div>
                     <div className="mt-2 pt-2 border-t">
-                      <span className="text-sm text-muted-foreground">{budget.period}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {budget.period}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
@@ -479,12 +577,14 @@ const Manage = () => {
         isOpen={addSavingsModalOpen}
         onClose={() => setAddSavingsModalOpen(false)}
         type="savings"
+        refreshGoals={fetchSavingsGoals}
       />
 
       <AddTransactionModal
         isOpen={addExpenseModalOpen}
         onClose={() => setAddExpenseModalOpen(false)}
         type="expense"
+        refreshGoals={fetchSavingsGoals}
       />
 
       <OCRUploadModal

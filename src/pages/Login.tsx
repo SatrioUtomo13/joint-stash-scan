@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { Eye, EyeOff, ArrowRight, Wallet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 import { login } from "@/services/auth";
+import { isAuthenticated } from "../utils";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -18,6 +19,10 @@ const Login = () => {
     password: ""
   });
   const { toast } = useToast();
+
+  if (isAuthenticated()) {
+    return <Navigate to="/" replace/>
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
