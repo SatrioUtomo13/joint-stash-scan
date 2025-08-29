@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { register } from "@/services/auth";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,8 +57,8 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const res = await register(formData.name, formData.email, formData.password);
-      console.log(res);
+      await register(formData.name, formData.email, formData.password);
+      navigate("/login");
 
       toast({
         title: "Account created successfully!",

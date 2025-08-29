@@ -1,20 +1,31 @@
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { getSavingsGoals } from "@/services/goal";
+import { depostiSavingGoals } from "@/services/goal";
 import { savingGoalsDropdown } from "@/services/dropdown";
-
 
 interface AddTransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
   type: "savings" | "expense";
+  refreshGoals: () => void;
 }
 
 const expenseCategories = [
@@ -25,55 +36,76 @@ const expenseCategories = [
   "Bills & Utilities",
   "Healthcare",
   "Education",
-  "Other"
+  "Other",
 ];
 
-export const AddTransactionModal = ({ isOpen, onClose, type }: AddTransactionModalProps) => {
+export const AddTransactionModal = ({
+  isOpen,
+  onClose,
+  type,
+  refreshGoals,
+}: AddTransactionModalProps) => {
   const { toast } = useToast();
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [goalOptions, setGoalOptions] = useState<{ id: number, title: string }[]>([])
+  const [goalOptions, setGoalOptions] = useState<
+    { id: number; title: string }[]
+  >([]);
   const [selectedGoal, setSelectedGoal] = useState("");
 
   const fetchGoals = async () => {
     try {
-      const response = await savingGoalsDropdown()
-      setGoalOptions(response)
-
+      const response = await savingGoalsDropdown();
+      setGoalOptions(response);
     } catch (error) {
-      console.error("Error fetching savings goals:", error)
+      console.error("Error fetching savings goals:", error);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchGoals()
-  }, [])
+    fetchGoals();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!amount || !description) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields",
-        variant: "destructive"
-      });
-      return;
+    if (type == "savings") {
+      if (!amount) {
+        toast({
+          title: "Missing Information",
+          description: "Please fill in all required fields",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setIsSubmitting(true);
 
     try {
-      // const response = await 
-    } catch (error) {
+      const response = await depostiSavingGoals(selectedGoal, parseInt(amount));
+      console.log("ini response", response);
 
+      if (response) {
+        toast({
+          title: "Transaction Added",
+          description: `${
+            type === "savings" ? "Savings" : "Expense"
+          } recorded successfully`,
+        });
+      }
+      refreshGoals();
+    } catch (error) {
+      console.error("Error adding transaction:", error);
     }
 
     toast({
       title: "Transaction Added",
-      description: `${type === "savings" ? "Savings" : "Expense"} recorded successfully`,
+      description: `${
+        type === "savings" ? "Savings" : "Expense"
+      } recorded successfully`,
     });
 
     setIsSubmitting(false);
@@ -84,13 +116,13 @@ export const AddTransactionModal = ({ isOpen, onClose, type }: AddTransactionMod
   };
 
   const formatCurrency = (value: string) => {
-    const numericValue = value.replace(/[^\d]/g, '');
-    if (!numericValue) return '';
+    const numericValue = value.replace(/[^\d]/g, "");
+    if (!numericValue) return "";
 
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
     }).format(parseInt(numericValue));
   };
 
@@ -187,12 +219,15 @@ export const AddTransactionModal = ({ isOpen, onClose, type }: AddTransactionMod
             <Button
               type="submit"
               disabled={isSubmitting}
-              className={`flex-1 ${type === "savings"
-                ? "bg-gradient-accent hover:shadow-glow"
-                : "bg-gradient-primary hover:shadow-elegant"
-                }`}
+              className={`flex-1 ${
+                type === "savings"
+                  ? "bg-gradient-accent hover:shadow-glow"
+                  : "bg-gradient-primary hover:shadow-elegant"
+              }`}
             >
-              {isSubmitting ? "Adding..." : `Add ${type === "savings" ? "Savings" : "Expense"}`}
+              {isSubmitting
+                ? "Adding..."
+                : `Add ${type === "savings" ? "Savings" : "Expense"}`}
             </Button>
           </div>
         </form>

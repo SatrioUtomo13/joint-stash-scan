@@ -2,8 +2,13 @@ import api from './api';
 import API_ENDPOINTS from './API_ENDPOINTS';
 
 export const createSavingsGoal = async (data: any) => {
+const token = localStorage.getItem("token");
     try {
-        const res = await api.post(API_ENDPOINTS.savingsgoal, data);
+        const res = await api.post(API_ENDPOINTS.savingsgoal, data, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
         return res.data;
     } catch (error) {
         throw error;
@@ -21,5 +26,20 @@ const token = localStorage.getItem("token");
     return res.data
   } catch (error) {
     throw error
+  }
+}
+
+export const depostiSavingGoals = async (goal_id: string, amount: number) => {
+  const token = localStorage.getItem("token")
+  const url = `${API_ENDPOINTS.savingsgoal}${goal_id}/deposit`
+  try {
+    const res = await api.post(url, {amount}, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    return res.data
+  } catch (error) {
+    throw error    
   }
 }
