@@ -20,7 +20,7 @@ const mockMembers: GroupMember[] = [
     email: "john@example.com",
     role: "admin",
     totalContributed: 15000000,
-    lastActivity: "2024-01-15"
+    lastActivity: "2024-01-15",
   },
   {
     id: "2",
@@ -28,7 +28,7 @@ const mockMembers: GroupMember[] = [
     email: "jane@example.com",
     role: "member",
     totalContributed: 12500000,
-    lastActivity: "2024-01-14"
+    lastActivity: "2024-01-14",
   },
   {
     id: "3",
@@ -36,7 +36,7 @@ const mockMembers: GroupMember[] = [
     email: "mike@example.com",
     role: "member",
     totalContributed: 10000000,
-    lastActivity: "2024-01-13"
+    lastActivity: "2024-01-13",
   },
   {
     id: "4",
@@ -44,22 +44,26 @@ const mockMembers: GroupMember[] = [
     email: "sarah@example.com",
     role: "member",
     totalContributed: 7500000,
-    lastActivity: "2024-01-12"
-  }
+    lastActivity: "2024-01-12",
+  },
 ];
 
-export const GroupMembers = () => {
+export const GroupMembers = ({ members }: { members: any[] }) => {
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
       minimumFractionDigits: 0,
-      notation: 'compact'
+      notation: "compact",
     }).format(amount);
   };
 
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   };
 
   return (
@@ -70,25 +74,27 @@ export const GroupMembers = () => {
           Group Members
         </CardTitle>
       </CardHeader>
-      
+
       <CardContent>
         <div className="space-y-4">
-          {mockMembers.map((member, index) => (
+          {members.map((member, index) => (
             <div
               key={member.id}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 transition-all duration-300 hover-scale animate-fade-in"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <Avatar className="h-10 w-10 transition-transform duration-300 hover:scale-110">
-                <AvatarImage src={member.avatar} alt={member.name} />
+                <AvatarImage src={member.avatar} alt={member.username} />
                 <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                  {getInitials(member.name)}
+                  {getInitials(member.username)}
                 </AvatarFallback>
               </Avatar>
-              
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="font-medium text-sm truncate">{member.name}</p>
+                  <p className="font-medium text-sm truncate">
+                    {member.username}
+                  </p>
                   {member.role === "admin" && (
                     <Crown className="w-3 h-3 text-warning" />
                   )}
@@ -97,14 +103,14 @@ export const GroupMembers = () => {
                   {member.email}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
-                  <Badge 
+                  <Badge
                     variant={member.role === "admin" ? "default" : "secondary"}
                     className="text-xs"
                   >
                     {member.role}
                   </Badge>
                   <span className="text-xs text-accent font-medium">
-                    {formatCurrency(member.totalContributed)}
+                    {formatCurrency(member.total_contributed)}
                   </span>
                 </div>
               </div>

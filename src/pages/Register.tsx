@@ -3,7 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Eye, EyeOff, ArrowRight, Wallet, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -18,14 +24,14 @@ const Register = () => {
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -34,7 +40,7 @@ const Register = () => {
       toast({
         title: "Password mismatch",
         description: "Passwords do not match. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return false;
     }
@@ -42,7 +48,7 @@ const Register = () => {
       toast({
         title: "Password too short",
         description: "Password must be at least 6 characters long.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return false;
     }
@@ -62,14 +68,14 @@ const Register = () => {
 
       toast({
         title: "Account created successfully!",
-        description: "Welcome to JointStash. You can now start saving together.",
+        description:
+          "Welcome to JointStash. You can now start saving together.",
       });
-
     } catch (error) {
       toast({
         title: "Registration failed",
         description: "Something went wrong. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -77,7 +83,9 @@ const Register = () => {
   };
 
   const passwordStrength = formData.password.length >= 6;
-  const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword !== "";
+  const passwordsMatch =
+    formData.password === formData.confirmPassword &&
+    formData.confirmPassword !== "";
 
   return (
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">
@@ -100,7 +108,9 @@ const Register = () => {
         {/* Register Card */}
         <Card className="border-0 shadow-elegant bg-card/80 backdrop-blur-sm animate-card">
           <CardHeader className="space-y-1 pb-6">
-            <CardTitle className="text-2xl font-bold text-center">Create account</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">
+              Create account
+            </CardTitle>
             <CardDescription className="text-center">
               Join thousands who save together
             </CardDescription>
@@ -108,7 +118,7 @@ const Register = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">Username</Label>
                 <Input
                   id="name"
                   name="name"
@@ -164,9 +174,16 @@ const Register = () => {
                 </div>
                 {formData.password && (
                   <div className="flex items-center gap-2 text-xs">
-                    <div className={`transition-colors duration-300 ${passwordStrength ? 'text-green-600' : 'text-muted-foreground'
-                      }`}>
-                      {passwordStrength && <Check className="h-3 w-3 inline mr-1" />}
+                    <div
+                      className={`transition-colors duration-300 ${
+                        passwordStrength
+                          ? "text-green-600"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {passwordStrength && (
+                        <Check className="h-3 w-3 inline mr-1" />
+                      )}
                       At least 6 characters
                     </div>
                   </div>
@@ -202,9 +219,16 @@ const Register = () => {
                 </div>
                 {formData.confirmPassword && (
                   <div className="flex items-center gap-2 text-xs">
-                    <div className={`transition-colors duration-300 ${passwordsMatch ? 'text-green-600' : 'text-muted-foreground'
-                      }`}>
-                      {passwordsMatch && <Check className="h-3 w-3 inline mr-1" />}
+                    <div
+                      className={`transition-colors duration-300 ${
+                        passwordsMatch
+                          ? "text-green-600"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {passwordsMatch && (
+                        <Check className="h-3 w-3 inline mr-1" />
+                      )}
                       Passwords match
                     </div>
                   </div>
@@ -241,7 +265,10 @@ const Register = () => {
         </Card>
 
         {/* Footer */}
-        <div className="text-center mt-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+        <div
+          className="text-center mt-8 animate-fade-in"
+          style={{ animationDelay: "0.2s" }}
+        >
           <p className="text-xs text-muted-foreground">
             By creating an account, you agree to our Terms & Privacy
           </p>
