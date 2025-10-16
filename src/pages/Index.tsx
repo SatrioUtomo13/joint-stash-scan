@@ -14,7 +14,11 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 
-import { createSavingsGoal, getSavingsGoals } from "@/services/goal";
+import {
+  createSavingsGoal,
+  getSavingsGoals,
+  getGoalMembers,
+} from "@/services/goal";
 
 const Index = () => {
   const { toast } = useToast();
@@ -31,6 +35,26 @@ const Index = () => {
   const [selectedBudgetMembers, setSelectedBudgetMembers] = useState<
     string | null
   >(null);
+  const [members, setMembers] = useState<any[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      if (!selectedGoalMembers) return;
+
+      setLoadingMembers(true);
+      try {
+        const res = await getGoalMembers(selectedGoalMembers);
+        setMembers(res);
+      } catch (error) {
+        toast({ title: "Failed to load members", variant: "destructive" });
+      } finally {
+        setLoadingMembers(false);
+      }
+    };
+
+    fetchMembers();
+  }, [selectedGoalMembers]);
 
   // Mock data - in real app this would come from backend
   const savingsGoals = [
@@ -89,7 +113,7 @@ const Index = () => {
     fetchSavingsGoals();
   }, []);
 
-  console.log("savingsData", savingsData);
+  console.log("selected goal", selectedGoalMembers);
 
   const handleAddTransaction = (type: "savings" | "expense") => {
     setTransactionType(type);
@@ -184,12 +208,18 @@ const Index = () => {
             <DialogHeader>
               <DialogTitle>
                 {selectedGoalMembers &&
-                  savingsGoals.find((g) => g.id === selectedGoalMembers)
-                    ?.goalTitle}{" "}
+                  savingsData.find((g) => g.id === selectedGoalMembers)
+                    ?.title}{" "}
                 - Members
               </DialogTitle>
             </DialogHeader>
-            <GroupMembers />
+            {loadingMembers ? (
+              <p className="text-sm text-muted-foreground">
+                Loading members...
+              </p>
+            ) : (
+              <GroupMembers members={members} />
+            )}
           </DialogContent>
         </Dialog>
 
@@ -207,7 +237,7 @@ const Index = () => {
                 - Members
               </DialogTitle>
             </DialogHeader>
-            <GroupMembers />
+            {/* <GroupMembers /> */}
           </DialogContent>
         </Dialog>
       </div>

@@ -18,6 +18,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   PlusCircle,
   Target,
@@ -33,7 +45,13 @@ import { useToast } from "@/components/ui/use-toast";
 import { AddTransactionModal } from "@/components/AddTransactionModal";
 import { OCRUploadModal } from "@/components/OCRUploadModal";
 
-import { createSavingsGoal, getSavingsGoals } from "@/services/goal";
+import {
+  createSavingsGoal,
+  getSavingsGoals,
+  deleteSavingGoal,
+  getSavingGoalById,
+  updateSavingGoal,
+} from "@/services/goal";
 
 interface SavingsGoal {
   id: string;
@@ -54,24 +72,6 @@ interface Budget {
 const Manage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Mock data - in real app this would come from backend
-  const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([
-    {
-      id: "1",
-      title: "Dream House Fund",
-      currentAmount: 45000000,
-      target: 100000000,
-      contributors: 4,
-    },
-    {
-      id: "2",
-      title: "Wedding Dream",
-      currentAmount: 15000000,
-      target: 50000000,
-      contributors: 2,
-    },
-  ]);
 
   const [budgets, setBudgets] = useState<Budget[]>([
     {
@@ -94,9 +94,11 @@ const Manage = () => {
     title: "",
     target: "",
     description: "",
+    deadline: "",
     members: [] as string[],
   });
   const [savingsData, setSavingsData] = useState([]);
+  const [editingGoal, setEditingGoal] = useState<any | null>(null);
 
   const [memberInput, setMemberInput] = useState("");
   const [newBudget, setNewBudget] = useState({
@@ -123,6 +125,8 @@ const Manage = () => {
   const fetchSavingsGoals = async () => {
     try {
       const response = await getSavingsGoals();
+      console.log("ini response", response);
+
       setSavingsData(response);
     } catch (error) {
       toast({ title: "Error fetching savings goals", variant: "destructive" });
@@ -132,6 +136,23 @@ const Manage = () => {
   useEffect(() => {
     fetchSavingsGoals();
   }, []);
+
+  const fetchSavingGoalById = async (id: string) => {
+    try {
+      const response = await getSavingGoalById(id);
+      setEditingGoal(response);
+      setNewSavings({
+        title: response.title,
+        target: response.target,
+        description: response.description ?? "",
+        deadline: response.deadline ? response.deadline.split("T")[0] : "",
+        members: response.members.map((m: any) => m.email),
+      });
+      setSavingsDialogOpen(true);
+    } catch (error) {
+      toast({ title: "Failed to fetch goal detail", variant: "destructive" });
+    }
+  };
 
   const handleAddMember = () => {
     if (memberInput.trim() !== "") {
@@ -179,15 +200,39 @@ const Manage = () => {
       members: newSavings.members,
     };
     try {
-      const response = await createSavingsGoal(payload);
-      if (response) {
-        setNewSavings({ title: "", target: "", description: "", members: [] });
-        setSavingsDialogOpen(false);
+      if (editingGoal) {
+        const response = await updateSavingGoal(editingGoal.id, payload);
+        if (response) {
+          setNewSavings({
+            title: "",
+            target: "",
+            description: "",
+            deadline: "",
+            members: [],
+          });
+        }
+        toast({ title: "Savings goal updated successfully!" });
+      } else {
+        const response = await createSavingsGoal(payload);
+        if (response) {
+          setNewSavings({
+            title: "",
+            target: "",
+            description: "",
+            deadline: "",
+            members: [],
+          });
+        }
         toast({ title: "Savings goal created successfully!" });
-        fetchSavingsGoals();
       }
+
+      setSavingsDialogOpen(false);
+      fetchSavingsGoals();
     } catch (error) {
-      toast({ title: "Error creating savings goal", variant: "destructive" });
+      toast({
+        title: error.response?.data?.detail || "Error creating savings goal",
+        variant: "destructive",
+      });
     }
   };
 
@@ -208,9 +253,14 @@ const Manage = () => {
     toast({ title: "Budget created successfully!" });
   };
 
-  const deleteSavings = (id: string) => {
-    setSavingsGoals(savingsGoals.filter((goal) => goal.id !== id));
-    toast({ title: "Savings goal deleted" });
+  const deleteSavings = async (id: string) => {
+    try {
+      await deleteSavingGoal(id);
+      toast({ title: "Savings goal deleted" });
+      await fetchSavingsGoals();
+    } catch (error) {
+      toast({ title: "Error deleting savings goal", variant: "destructive" });
+    }
   };
 
   const deleteBudget = (id: string) => {
@@ -288,7 +338,11 @@ const Manage = () => {
                 </DialogTrigger>
                 <DialogContent className="animate-scale-in">
                   <DialogHeader>
-                    <DialogTitle>Create New Savings Goal</DialogTitle>
+                    <DialogTitle>
+                      {editingGoal
+                        ? "Edit Savings Goal"
+                        : "Create New Savings Goal"}
+                    </DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
@@ -344,6 +398,20 @@ const Manage = () => {
                       />
                     </div>
                     <div>
+                      <Label htmlFor="deadline">Deadline</Label>
+                      <Input
+                        id="deadline"
+                        type="date"
+                        value={newSavings.deadline}
+                        onChange={(e) =>
+                          setNewSavings({
+                            ...newSavings,
+                            deadline: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
                       <Label htmlFor="members">Add Members</Label>
                       <div className="flex space-x-2">
                         <Input
@@ -384,7 +452,7 @@ const Manage = () => {
                       ))}
                     </div>
                     <Button onClick={handleAddGoal} className="w-full">
-                      Create Goal
+                      {editingGoal ? "Update Goal" : "Create Goal"}
                     </Button>
                   </div>
                 </DialogContent>
@@ -406,17 +474,35 @@ const Manage = () => {
                           variant="ghost"
                           size="sm"
                           className="hover-scale"
+                          onClick={() => fetchSavingGoalById(goal.id)}
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="hover-scale text-destructive hover:text-destructive"
-                          onClick={() => deleteSavings(goal.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger>
+                            {" "}
+                            <Trash2 className="w-4 h-4 hover-scale text-destructive hover:text-destructive" />
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Are you absolutely sure?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will
+                                permanently remove your data from our servers.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => deleteSavings(goal.id)}
+                              >
+                                Continue
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </CardTitle>
                   </CardHeader>

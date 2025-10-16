@@ -80,33 +80,36 @@ export const AddTransactionModal = ({
         });
         return;
       }
+
+      try {
+        const response = await depostiSavingGoals(
+          selectedGoal,
+          parseInt(amount)
+        );
+        console.log("ini response", response);
+
+        if (response) {
+          toast({
+            title: "Transaction Added",
+            description: `${
+              type === "savings" ? "Savings" : "Expense"
+            } recorded successfully`,
+          });
+        }
+        refreshGoals();
+      } catch (error) {
+        console.error("Error adding transaction:", error);
+      }
     }
 
     setIsSubmitting(true);
 
-    try {
-      const response = await depostiSavingGoals(selectedGoal, parseInt(amount));
-      console.log("ini response", response);
-
-      if (response) {
-        toast({
-          title: "Transaction Added",
-          description: `${
-            type === "savings" ? "Savings" : "Expense"
-          } recorded successfully`,
-        });
-      }
-      refreshGoals();
-    } catch (error) {
-      console.error("Error adding transaction:", error);
-    }
-
-    toast({
-      title: "Transaction Added",
-      description: `${
-        type === "savings" ? "Savings" : "Expense"
-      } recorded successfully`,
-    });
+    // toast({
+    //   title: "Transaction Added",
+    //   description: `${
+    //     type === "savings" ? "Savings" : "Expense"
+    //   } recorded successfully`,
+    // });
 
     setIsSubmitting(false);
     setAmount("");
