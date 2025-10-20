@@ -104,13 +104,6 @@ export const AddTransactionModal = ({
 
     setIsSubmitting(true);
 
-    // toast({
-    //   title: "Transaction Added",
-    //   description: `${
-    //     type === "savings" ? "Savings" : "Expense"
-    //   } recorded successfully`,
-    // });
-
     setIsSubmitting(false);
     setAmount("");
     setDescription("");
@@ -150,7 +143,7 @@ export const AddTransactionModal = ({
                 <Label htmlFor="goal">Goal</Label>
                 <Select value={selectedGoal} onValueChange={setSelectedGoal}>
                   <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder="Select goal" />
                   </SelectTrigger>
                   <SelectContent>
                     {goalOptions.map((opt) => (
