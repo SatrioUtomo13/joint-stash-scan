@@ -8,7 +8,11 @@ interface DashboardHeaderProps {
   onOCRUpload: () => void;
 }
 
-export const DashboardHeader = ({ onAddSavings, onAddExpense, onOCRUpload }: DashboardHeaderProps) => {
+export const DashboardHeader = ({
+  onAddSavings,
+  onAddExpense,
+  onOCRUpload,
+}: DashboardHeaderProps) => {
   const navigate = useNavigate();
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -21,7 +25,10 @@ export const DashboardHeader = ({ onAddSavings, onAddExpense, onOCRUpload }: Das
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-3 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+      <div
+        className="flex flex-wrap gap-3 animate-fade-in"
+        style={{ animationDelay: "0.2s" }}
+      >
         <Button
           onClick={() => navigate("/manage")}
           variant="outline"

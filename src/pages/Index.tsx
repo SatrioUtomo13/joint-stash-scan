@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Layout from "@/pages/Layout";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { SavingsCard } from "@/components/SavingsCard";
 import { BudgetCard } from "@/components/BudgetCard";
@@ -113,135 +114,135 @@ const Index = () => {
     fetchSavingsGoals();
   }, []);
 
-  console.log("selected goal", selectedGoalMembers);
-
   const handleAddTransaction = (type: "savings" | "expense") => {
     setTransactionType(type);
     setIsAddModalOpen(true);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle animate-fade-in">
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
-        <div className="animate-scale-in">
-          <DashboardHeader
-            onAddSavings={() => handleAddTransaction("savings")}
-            onAddExpense={() => handleAddTransaction("expense")}
-            onOCRUpload={() => setIsOCRModalOpen(true)}
+    <Layout>
+      <div className="min-h-screen bg-gradient-subtle animate-fade-in">
+        <div className="container mx-auto px-4 py-6 max-w-7xl">
+          <div className="animate-scale-in">
+            <DashboardHeader
+              onAddSavings={() => handleAddTransaction("savings")}
+              onAddExpense={() => handleAddTransaction("expense")}
+              onOCRUpload={() => setIsOCRModalOpen(true)}
+            />
+          </div>
+
+          <div className="space-y-6">
+            {/* Savings Goals Grid */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Savings Goals</h2>
+              <div
+                className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 animate-fade-in"
+                style={{ animationDelay: "0.1s" }}
+              >
+                {savingsData.map((goal, index) => (
+                  <div
+                    key={goal.id}
+                    className="animate-card"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div
+                      onClick={() => setSelectedGoalMembers(goal.id)}
+                      className="cursor-pointer"
+                    >
+                      <SavingsCard {...goal} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Budgets Grid */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Budgets</h2>
+              <div
+                className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in"
+                style={{ animationDelay: "0.2s" }}
+              >
+                {budgets.map((budget, index) => (
+                  <div
+                    key={budget.id}
+                    className="animate-card"
+                    style={{
+                      animationDelay: `${(index + savingsGoals.length) * 0.1}s`,
+                    }}
+                  >
+                    <div
+                      onClick={() => setSelectedBudgetMembers(budget.id)}
+                      className="cursor-pointer"
+                    >
+                      <BudgetCard {...budget} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="animate-fade-in" style={{ animationDelay: "0.4s" }}>
+              <TransactionHistory />
+            </div>
+          </div>
+
+          <AddTransactionModal
+            isOpen={isAddModalOpen}
+            onClose={() => setIsAddModalOpen(false)}
+            type={transactionType}
+            refreshGoals={fetchSavingsGoals}
           />
+
+          <OCRUploadModal
+            isOpen={isOCRModalOpen}
+            onClose={() => setIsOCRModalOpen(false)}
+          />
+
+          {/* Group Members Modal for Savings Goals */}
+          <Dialog
+            open={!!selectedGoalMembers}
+            onOpenChange={() => setSelectedGoalMembers(null)}
+          >
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>
+                  {selectedGoalMembers &&
+                    savingsData.find((g) => g.id === selectedGoalMembers)
+                      ?.title}{" "}
+                  - Members
+                </DialogTitle>
+              </DialogHeader>
+              {loadingMembers ? (
+                <p className="text-sm text-muted-foreground">
+                  Loading members...
+                </p>
+              ) : (
+                <GroupMembers members={members} />
+              )}
+            </DialogContent>
+          </Dialog>
+
+          {/* Group Members Modal for Budgets */}
+          <Dialog
+            open={!!selectedBudgetMembers}
+            onOpenChange={() => setSelectedBudgetMembers(null)}
+          >
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>
+                  {selectedBudgetMembers &&
+                    budgets.find((b) => b.id === selectedBudgetMembers)
+                      ?.title}{" "}
+                  - Members
+                </DialogTitle>
+              </DialogHeader>
+              {/* <GroupMembers /> */}
+            </DialogContent>
+          </Dialog>
         </div>
-
-        <div className="space-y-6">
-          {/* Savings Goals Grid */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Savings Goals</h2>
-            <div
-              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 animate-fade-in"
-              style={{ animationDelay: "0.1s" }}
-            >
-              {savingsData.map((goal, index) => (
-                <div
-                  key={goal.id}
-                  className="animate-card"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div
-                    onClick={() => setSelectedGoalMembers(goal.id)}
-                    className="cursor-pointer"
-                  >
-                    <SavingsCard {...goal} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Budgets Grid */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Budgets</h2>
-            <div
-              className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in"
-              style={{ animationDelay: "0.2s" }}
-            >
-              {budgets.map((budget, index) => (
-                <div
-                  key={budget.id}
-                  className="animate-card"
-                  style={{
-                    animationDelay: `${(index + savingsGoals.length) * 0.1}s`,
-                  }}
-                >
-                  <div
-                    onClick={() => setSelectedBudgetMembers(budget.id)}
-                    className="cursor-pointer"
-                  >
-                    <BudgetCard {...budget} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="animate-fade-in" style={{ animationDelay: "0.4s" }}>
-            <TransactionHistory />
-          </div>
-        </div>
-
-        <AddTransactionModal
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
-          type={transactionType}
-          refreshGoals={fetchSavingsGoals}
-        />
-
-        <OCRUploadModal
-          isOpen={isOCRModalOpen}
-          onClose={() => setIsOCRModalOpen(false)}
-        />
-
-        {/* Group Members Modal for Savings Goals */}
-        <Dialog
-          open={!!selectedGoalMembers}
-          onOpenChange={() => setSelectedGoalMembers(null)}
-        >
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>
-                {selectedGoalMembers &&
-                  savingsData.find((g) => g.id === selectedGoalMembers)
-                    ?.title}{" "}
-                - Members
-              </DialogTitle>
-            </DialogHeader>
-            {loadingMembers ? (
-              <p className="text-sm text-muted-foreground">
-                Loading members...
-              </p>
-            ) : (
-              <GroupMembers members={members} />
-            )}
-          </DialogContent>
-        </Dialog>
-
-        {/* Group Members Modal for Budgets */}
-        <Dialog
-          open={!!selectedBudgetMembers}
-          onOpenChange={() => setSelectedBudgetMembers(null)}
-        >
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>
-                {selectedBudgetMembers &&
-                  budgets.find((b) => b.id === selectedBudgetMembers)
-                    ?.title}{" "}
-                - Members
-              </DialogTitle>
-            </DialogHeader>
-            {/* <GroupMembers /> */}
-          </DialogContent>
-        </Dialog>
       </div>
-    </div>
+    </Layout>
   );
 };
 
